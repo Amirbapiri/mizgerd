@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, json
 
 app = Flask(__name__)
 
@@ -30,13 +30,11 @@ events = [
 @app.route("/event", methods=["POST"])
 def create_event():
     data = request.json
-    if data:
-        if (not "title" in data) or (not "description" in data) or (not "dates" in data):
-            return jsonify({"Detail": "'title', 'description' and 'dates' are required."}), 400
-        else:
-            if data["title"] and data["description"] and data["dates"]:
-                events.append(data)
-                return jsonify(data), 201
-            else:
-                return jsonify({"Detail": "'title', 'description' or dates can't be left blank."}), 400
-    return jsonify({"Detail": "Failed! proper data must be provided."}), 400
+    is_data_provided = ("title" in data and bool(data["title"])) and ("description" in data and bool(
+        data["description"])) and ("dates" in data and bool(len(data["dates"])))
+    if data and is_data_provided:
+        events.append(data)
+        return jsonify(data), 201
+    else:
+        return jsonify({"Detail": "'title', 'description' and 'dates' are required."}), 400
+    return jsonify({"Detail": "Failed! something goes wrong here!"}), 400
