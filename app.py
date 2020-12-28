@@ -27,7 +27,7 @@ events = [
 ]
 
 
-@app.route("/events/new", methods=["POST"])
+@app.route("/event", methods=["POST"])
 def create_event():
     data = request.json
     if data:
