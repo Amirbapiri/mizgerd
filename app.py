@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, Response, json
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
@@ -37,4 +37,3 @@ def create_event():
         return jsonify(data), 201
     else:
         return jsonify({"Detail": "'title', 'description' and 'dates' are required."}), 400
-    return jsonify({"Detail": "Failed! something goes wrong here!"}), 400
