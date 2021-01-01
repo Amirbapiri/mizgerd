@@ -37,3 +37,12 @@ def create_event():
         return jsonify(data), 201
     else:
         return jsonify({"Detail": "'title', 'description' and 'dates' are required."}), 400
+
+
+@app.route("/events/<string:title>", methods=["GET"])
+def get_event(title):
+    res = next(
+        iter(filter(lambda x: x["title"] == title, events) or []), None)
+    if res:
+        return jsonify(res), 200
+    return jsonify({"Detail": "Couldn't find any event with given 'title'."}), 400
