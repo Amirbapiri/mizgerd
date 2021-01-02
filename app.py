@@ -37,3 +37,10 @@ def create_event():
         return jsonify(data), 201
     else:
         return jsonify({"Detail": "'title', 'description' and 'dates' are required."}), 400
+
+
+@app.route("/events/<string:title>", methods=["DELETE"])
+def delete_event(title):
+    global events
+    events = list(filter(lambda x: x["title"] != title, events))
+    return "", 204
