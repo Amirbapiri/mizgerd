@@ -21,3 +21,7 @@ class TestEvents(unittest.TestCase):
         )
         self.assertDictEqual(payload, response.json)
         self.assertEqual(201, response.status_code)
+
+    def test_list_events(self):
+        response = self.app.get("/events")
+        self.assertEqual(200, response.status_code)
