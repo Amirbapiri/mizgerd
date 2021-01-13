@@ -53,3 +53,7 @@ class TestEvents(unittest.TestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(payload.get("title"), response.json.get("title"))
         self.assertEqual(payload.get("description"), response.json.get("description"))
+
+    def test_delete_event(self):
+        response = self.app.delete("/events/event 2")
+        self.assertEqual(204, response.status_code)
