@@ -57,9 +57,7 @@ def update_event(title):
         if res:
             res.update(
                 title=data["title"] if "title" in data else res["title"],
-                description=data["description"]
-                if "description" in data
-                else res["description"],
+                description=data["description"] if "description" in data else res["description"],
             )
             return jsonify(res), 200
         return jsonify({"Detail": "Couldn't find any event with the given 'title'"})
