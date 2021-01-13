@@ -42,3 +42,14 @@ class TestEvents(unittest.TestCase):
         response = self.app.get("/events/event 1")
         self.assertEqual(200, response.status_code)
         self.assertDictEqual(EVENT, response.json)
+
+    def test_update_event(self):
+        payload = {"description": "TestUpdateDesc", "title": "TestUpdateTitle"}
+        response = self.app.put(
+            "/events/event 1",
+            headers={"Content-Type": "application/json"},
+            data=json.dumps(payload),
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(payload.get("title"), response.json.get("title"))
+        self.assertEqual(payload.get("description"), response.json.get("description"))
