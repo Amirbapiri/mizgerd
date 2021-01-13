@@ -25,3 +25,20 @@ class TestEvents(unittest.TestCase):
     def test_list_events(self):
         response = self.app.get("/events")
         self.assertEqual(200, response.status_code)
+
+    def test_get_event(self):
+        EVENT = {
+            "dates": [
+                {
+                    "day": 4,
+                    "month": 2,
+                    "times": {"1": {"end": 12, "start": 10}, "2": {"end": 23, "start": 22}},
+                    "year": 2020,
+                }
+            ],
+            "description": "first description",
+            "title": "event 1",
+        }
+        response = self.app.get("/events/event 1")
+        self.assertEqual(200, response.status_code)
+        self.assertDictEqual(EVENT, response.json)
