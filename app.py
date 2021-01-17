@@ -14,6 +14,7 @@ events = [
         ],
         "description": "first description",
         "title": "event 1",
+        "is_finished": False,
     }
 ]
 
@@ -69,3 +70,12 @@ def delete_event(title):
     global events
     events = list(filter(lambda x: x["title"] != title, events))
     return "", 204
+
+
+@app.route("/events/<string:title>/finish", methods=["PUT"])
+def finish_vote(title):
+    res = next(iter(filter(lambda x: x["title"] == title, events) or []), None)
+    if res:
+        res.update(is_finished=True)
+        return jsonify(res), 200
+    return jsonify({"Detail": "Couldn't finish voting. 'title' is required."}), 400
