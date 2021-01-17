@@ -15,6 +15,7 @@ events = [
         "description": "first description",
         "title": "event 1",
         "is_finished": False,
+        "votes": 0,
     }
 ]
 
@@ -79,3 +80,14 @@ def finish_vote(title):
         res.update(is_finished=True)
         return jsonify(res), 200
     return jsonify({"Detail": "Couldn't finish voting. 'title' is required."}), 400
+
+
+@app.route("/events/<string:title>/vote", methods=["PUT"])
+def vote_event(title):
+    res = next(iter(filter(lambda x: x["title"] == title, events) or []), None)
+    if res:
+        if not res["is_finished"]:
+            res.update(votes=res["votes"] + 1)
+            return jsonify(res), 200
+        return jsonify({"Detail": "Voting is over. You can't vote anymore."}), 400
+    return jsonify({"Detail": "Couldn't find any event with given 'title'"}), 400
