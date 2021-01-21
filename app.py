@@ -4,16 +4,29 @@ app = Flask(__name__)
 
 events = [
     {
-        "dates": [
-            {
+        "dates": {
+            "1": {
                 "day": 4,
                 "month": 2,
-                "times": {"1": {"end": 12, "start": 10}, "2": {"end": 23, "start": 22}},
+                "times": {
+                    "1": {"end": 12, "start": 10, "votes": 0},
+                    "2": {"end": 23, "start": 22, "votes": 0},
+                },
                 "year": 2020,
-            }
-        ],
+            },
+            "2": {
+                "day": 4,
+                "month": 2,
+                "times": {
+                    "1": {"end": 12, "start": 10, "votes": 0},
+                    "2": {"end": 23, "start": 22, "votes": 0},
+                },
+                "year": 2020,
+            },
+        },
         "description": "first description",
         "title": "event 1",
+        "is_finished": False,
     }
 ]
 
@@ -69,3 +82,27 @@ def delete_event(title):
     global events
     events = list(filter(lambda x: x["title"] != title, events))
     return "", 204
+
+
+@app.route("/events/<string:title>/finish", methods=["PUT"])
+def finish_vote(title):
+    res = next(iter(filter(lambda x: x["title"] == title, events) or []), None)
+    if res:
+        res.update(is_finished=True)
+        return jsonify(res), 200
+    return jsonify({"Detail": "Couldn't finish voting. 'title' is required."}), 400
+
+
+@app.route("/events/<string:title>/<int:date_id>/<int:time_id>/vote", methods=["PUT"])
+def vote_event(title, date_id, time_id):
+    res = next(
+        iter(filter(lambda x: x["title"] == title, events) or []),
+        None,
+    )
+    if res:
+        selected_time = res["dates"][str(date_id)]["times"][str(time_id)]
+        if not res["is_finished"]:
+            selected_time.update(votes=selected_time["votes"] + 1)
+            return jsonify(res), 200
+        return jsonify({"Detail": "Voting is over. You can't vote anymore."}), 400
+    return jsonify({"Detail": "Couldn't find any event with given 'title'"}), 400
