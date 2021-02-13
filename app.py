@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 
 from flask_mail import Mail, Message
 
@@ -131,15 +131,7 @@ def find_event(title):
 
 def send_email(most_voted_object):
     msg = Message("Hello", sender=os.environ.get("eusr"), recipients=[os.environ.get("recipient")])
-    msg.html = (
-        f"<h1>Final meeting day determined.</h1> year: {most_voted_object['detail']['year']} "
-        f"<h1>Title: {most_voted_object['detail']['title']}</h1>"
-        f"<h3>Description: {most_voted_object['detail']['description']}</h3>"
-        f"<b>month</b>: {most_voted_object['detail']['month']} "
-        f"<b>day</b>: {most_voted_object['detail']['day']} "
-        f"<b>Starts at</b>: {most_voted_object['detail']['time']['start']} "
-        f"</b>Ends at</b>: {most_voted_object['detail']['time']['end']} "
-    )
+    msg.html = render_template("email_template.html", obj=most_voted_object["detail"])
     mail.send(msg)
 
 
