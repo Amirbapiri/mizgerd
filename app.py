@@ -172,3 +172,16 @@ def register_user():
         users.append(data)
         return jsonify(data), 201
     return jsonify({"Detail": "Couldn't register user."}), 400
+
+
+@app.route("/users/signin", methods=["POST"])
+def login_user():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+
+    if email is not None and password is not None:
+        user = list(filter(lambda user: user["email"] == email and user["password"] == password, users))
+        if user:
+            return jsonify(user), 200
+        return jsonify({"Detail": "Couldn't find any user with provided credentials."}), 404
+    return jsonify({"Detail": "'email' and 'password' are required."}), 400
