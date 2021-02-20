@@ -45,6 +45,8 @@ events = [
 
 users = []
 
+sessions = []
+
 
 @app.route("/event", methods=["POST"])
 def create_event():
@@ -182,6 +184,7 @@ def login_user():
     if email is not None and password is not None:
         user = list(filter(lambda user: user["email"] == email and user["password"] == password, users))
         if user:
+            sessions.append(email)
             return jsonify(user), 200
         return jsonify({"Detail": "Couldn't find any user with provided credentials."}), 404
     return jsonify({"Detail": "'email' and 'password' are required."}), 400
