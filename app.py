@@ -43,6 +43,8 @@ events = [
     }
 ]
 
+users = []
+
 
 @app.route("/event", methods=["POST"])
 def create_event():
@@ -161,3 +163,12 @@ def mail_most_voted(title):
         return "Sent", 200
     else:
         return jsonify({"Detail": "Not found!"}), 404
+
+
+@app.route("/users/signup", methods=["POST"])
+def register_user():
+    data = request.json
+    if data not in users:
+        users.append(data)
+        return jsonify(data), 201
+    return jsonify({"Detail": "Couldn't register user."}), 400
