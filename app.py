@@ -190,3 +190,15 @@ def login_user():
             return jsonify({"Detail": "User already authenticated."}), 400
         return jsonify({"Detail": "Couldn't find any user with provided credentials."}), 404
     return jsonify({"Detail": "'email' and 'password' are required."}), 400
+
+
+@app.route("/users/logout", methods=["POST"])
+def logout_user():
+    data = request.json
+    email = data.get("email", None)
+    if email:
+        if email in sessions:
+            sessions.remove(email)
+            return jsonify({"Detail": "Logged out!"}), 200
+        return jsonify({"Detail": "User is not authenticated."}), 400
+    return jsonify({"Detail": "Email needs to be provided!"}), 400
