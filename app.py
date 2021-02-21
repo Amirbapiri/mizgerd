@@ -184,7 +184,9 @@ def login_user():
     if email is not None and password is not None:
         user = list(filter(lambda user: user["email"] == email and user["password"] == password, users))
         if user:
-            sessions.append(email)
-            return jsonify(user), 200
+            if email not in sessions:
+                sessions.append(email)
+                return jsonify(user), 200
+            return jsonify({"Detail": "User already authenticated."}), 400
         return jsonify({"Detail": "Couldn't find any user with provided credentials."}), 404
     return jsonify({"Detail": "'email' and 'password' are required."}), 400
