@@ -1,6 +1,19 @@
-from flask import Flask, jsonify, request
+import os
+
+from flask import Flask, jsonify, request, render_template
+
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
+
+app.config["MAIL_SERVER"] = "smtp.gmail.com"
+app.config["MAIL_PORT"] = 465
+app.config["MAIL_USERNAME"] = os.environ.get("SENDER_EMAIL")
+app.config["MAIL_PASSWORD"] = "upiubmmkfubmrhab"
+app.config["MAIL_USE_TLS"] = False
+app.config["MAIL_USE_SSL"] = True
+
+mail = Mail(app=app)
 
 events = [
     {
@@ -9,17 +22,17 @@ events = [
                 "day": 4,
                 "month": 2,
                 "times": {
-                    "1": {"end": 12, "start": 10, "votes": 0},
-                    "2": {"end": 23, "start": 22, "votes": 0},
+                    "1": {"end": 12, "start": 11, "votes": 0},
+                    "2": {"end": 24, "start": 23, "votes": 0},
                 },
                 "year": 2020,
             },
             "2": {
-                "day": 4,
+                "day": 12,
                 "month": 2,
                 "times": {
-                    "1": {"end": 12, "start": 10, "votes": 0},
-                    "2": {"end": 23, "start": 22, "votes": 0},
+                    "1": {"end": 16, "start": 14, "votes": 0},
+                    "2": {"end": 19, "start": 17, "votes": 0},
                 },
                 "year": 2020,
             },
@@ -106,3 +119,48 @@ def vote_event(title, date_id, time_id):
             return jsonify(res), 200
         return jsonify({"Detail": "Voting is over. You can't vote anymore."}), 400
     return jsonify({"Detail": "Couldn't find any event with given 'title'"}), 400
+
+
+def find_event(title):
+    event = next(iter(filter(lambda x: x["title"] == title, events) or []), None)
+    if event:
+        return event
+    else:
+        return None
+
+
+def send_email(most_voted_object, email):
+    msg = Message("Hello", sender=os.environ.get("SENDER_EMAIL"), recipients=[email])
+    msg.html = render_template("email_template.html", obj=most_voted_object["detail"])
+    mail.send(msg)
+
+
+@app.route("/events/<string:title>/mail", methods=["POST"])
+def mail_most_voted(title):
+    email = request.json.get("email")
+    if not email:
+        return jsonify({"Detail": "an 'email' needs to be provided!"}), 400
+    event = find_event(title)
+    if event:
+        most_voted_object = {}
+        if not event["is_finished"]:
+            return jsonify({"Detail": "Voting is not over yet!"}), 404
+        dates = event["dates"]
+        max_voted = 0
+        for dates_key in dates.keys():
+            times = dates[dates_key]["times"]
+            for times_key in times.keys():
+                if times[times_key]["votes"] > max_voted:
+                    max_voted = times[times_key]["votes"]
+                    most_voted_object["detail"] = {
+                        "time": times[times_key],
+                        "year": dates[dates_key]["year"],
+                        "month": dates[dates_key]["month"],
+                        "day": dates[dates_key]["day"],
+                        "title": event["title"],
+                        "description": event["description"],
+                    }
+            send_email(most_voted_object, email)
+        return "Sent", 200
+    else:
+        return jsonify({"Detail": "Not found!"}), 404
