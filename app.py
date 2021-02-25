@@ -43,6 +43,8 @@ events = [
     }
 ]
 
+users = []
+
 
 @app.route("/event", methods=["POST"])
 def create_event():
@@ -164,3 +166,16 @@ def mail_most_voted(title):
         return "Sent", 200
     else:
         return jsonify({"Detail": "Not found!"}), 404
+
+
+@app.route("/users/signup", methods=["POST"])
+def register_user():
+    data = request.json
+    is_data_provided = ("id" in data) and ("email" in data) and ("password" in data)
+    if is_data_provided:
+        user = list(filter(lambda user: user["email"] == data.get("email") or user["id"] == data.get("id"), users))
+        if data not in users and not user:
+            users.append(data)
+            return jsonify(data), 201
+        return jsonify({"Detail": "User already exists."}), 400
+    return jsonify({"Detail": "a unique 'id' and a unique 'email' and a 'password' needs to be provided."}), 400
