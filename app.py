@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 app.config["MAIL_SERVER"] = "smtp.gmail.com"
 app.config["MAIL_PORT"] = 465
-app.config["MAIL_USERNAME"] = os.environ.get("eusr")
+app.config["MAIL_USERNAME"] = os.environ.get("SENDER_EMAIL")
 app.config["MAIL_PASSWORD"] = "upiubmmkfubmrhab"
 app.config["MAIL_USE_TLS"] = False
 app.config["MAIL_USE_SSL"] = True
@@ -130,7 +130,7 @@ def find_event(title):
 
 
 def send_email(most_voted_object):
-    msg = Message("Hello", sender=os.environ.get("eusr"), recipients=[os.environ.get("recipient")])
+    msg = Message("Hello", sender=os.environ.get("SENDER_EMAIL"), recipients=[os.environ.get("recipient")])
     msg.html = render_template("email_template.html", obj=most_voted_object["detail"])
     mail.send(msg)
 
