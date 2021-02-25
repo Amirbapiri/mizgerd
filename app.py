@@ -129,14 +129,17 @@ def find_event(title):
         return None
 
 
-def send_email(most_voted_object):
-    msg = Message("Hello", sender=os.environ.get("SENDER_EMAIL"), recipients=[os.environ.get("recipient")])
+def send_email(most_voted_object, email):
+    msg = Message("Hello", sender=os.environ.get("SENDER_EMAIL"), recipients=[email])
     msg.html = render_template("email_template.html", obj=most_voted_object["detail"])
     mail.send(msg)
 
 
 @app.route("/events/<string:title>/mail", methods=["POST"])
 def mail_most_voted(title):
+    email = request.json.get("email")
+    if not email:
+        return jsonify({"Detail": "an 'email' needs to be provided!"}), 400
     event = find_event(title)
     if event:
         most_voted_object = {}
@@ -157,7 +160,7 @@ def mail_most_voted(title):
                         "title": event["title"],
                         "description": event["description"],
                     }
-        send_email(most_voted_object)
+            send_email(most_voted_object, email)
         return "Sent", 200
     else:
         return jsonify({"Detail": "Not found!"}), 404
