@@ -45,6 +45,8 @@ events = [
 
 users = []
 
+sessions = []
+
 
 @app.route("/event", methods=["POST"])
 def create_event():
@@ -176,3 +178,19 @@ def register_user():
             return jsonify(data), 201
         return jsonify({"Detail": "User already exists."}), 400
     return jsonify({"Detail": "a unique 'id' and a unique 'email' and a 'password' needs to be provided."}), 400
+
+
+@app.route("/users/signin", methods=["POST"])
+def login_user():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+
+    if email is not None and password is not None:
+        user = list(filter(lambda user: user["email"] == email and user["password"] == password, users))
+        if user:
+            if email not in sessions:
+                sessions.append(email)
+                return jsonify(user), 200
+            return jsonify({"Detail": "User already authenticated."}), 400
+        return jsonify({"Detail": "Couldn't find any user with provided credentials."}), 404
+    return jsonify({"Detail": "'email' and 'password' are required."}), 400
