@@ -92,9 +92,11 @@ def update_event(title):
 
 @app.route("/events/<string:title>", methods=["DELETE"])
 def delete_event(title):
-    global events
-    events = list(filter(lambda x: x["title"] != title, events))
-    return "", 204
+    event = list(filter(lambda x: x["title"] == title, events))
+    if event:
+        events.remove(event.pop())
+        return jsonify(), 204
+    return jsonify({"Detail": "Couldn't find any event with the given 'title'."}), 404
 
 
 @app.route("/events/<string:title>/finish", methods=["PUT"])
