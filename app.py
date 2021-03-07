@@ -40,6 +40,7 @@ events = [
         "description": "first description",
         "title": "event 1",
         "is_finished": False,
+        "id": 1,
     }
 ]
 
